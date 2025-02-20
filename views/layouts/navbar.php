@@ -17,7 +17,7 @@
                 <?php endif; ?>
             </div>
             <div class="navbar-nav ms-auto">
-                <?php session_start(); // Ensure session is active ?>
+                <?php session_start(); ?>
                 <?php if (isset($_SESSION['user_role'])) : ?>
                     <span class="navbar-text text-white">
                         <?= ucfirst(htmlspecialchars($_SESSION['user_role'])) ?>

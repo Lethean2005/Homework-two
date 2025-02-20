@@ -13,17 +13,27 @@ class UserController extends BaseController {
     public function create() {
         $this->view("users/create");
     }
-    // store
+
     public function store() {
         $name = htmlspecialchars($_POST['name']);
         $email = htmlspecialchars($_POST['email']);
         $password = htmlspecialchars($_POST['password']);
         $encrypted_password = password_hash($password, PASSWORD_DEFAULT);
         $role = htmlspecialchars($_POST['role']);
+    
+        // Check if the email already exists
+        $existingUser = $this->users->getUserByEmail($email);
+        if ($existingUser) {
+            echo "<script>alert('Email already exists. Please use a different email.'); window.history.back();</script>";
+            exit; 
+        }
+    
+        // If email does not exist, proceed with user creation
         $this->users->createUser($name, $email, $encrypted_password, $role);
         header("Location: /users");
     }
-    // edit
+    
+    
      public function edit($id) {
         session_start();
         if ($_SESSION['user_role'] !== 'admin') {
@@ -33,7 +43,6 @@ class UserController extends BaseController {
         $user = $this->users->getUserById($id);
         $this->view("users/edit", ['user' => $user]);
     }
-    // update
     public function update($id) {
         $name = htmlspecialchars($_POST['name']);
         $email = htmlspecialchars($_POST['email']);
@@ -41,17 +50,16 @@ class UserController extends BaseController {
         $this->users->updateUser($id, $name, $email, $role);
         header("Location: /users");
     }  
-    // delete 
     public function delete($id) {
         $this->users->deleteUser($id);
         header("Location: /users");
     }
-    // login
+
     public function login() {
         $this->view("users/login");
     }
     
-    //authenticate 
+   
     public function authenticate() {
         session_start();
         $email = htmlspecialchars($_POST['email']);
@@ -66,7 +74,7 @@ class UserController extends BaseController {
             $this->view("users/login", ['error' => 'Invalid email or password']);
         }
     }
-    // logout
+    
     public function logout() {
         session_start();
         session_unset();
